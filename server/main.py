@@ -8,7 +8,7 @@ import math
 import datetime as dt
 from typing import Optional, List, Dict
 
-# Adaugă directorul server la path pentru importuri
+# Add server directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 import uvicorn
@@ -40,13 +40,13 @@ CLIENT_DIR = os.path.join(os.path.dirname(__file__), "..", "client")
 app.mount("/static", StaticFiles(directory=CLIENT_DIR), name="static")
 
 
-# Funcții pentru NASA Space-Track API
+# Functions for NASA Space-Track API
 def fetch_nasa_debris(limit: int = 200) -> List[Dict]:
     """
     Fetch real debris data from NASA Space-Track API
-    Pentru demonstrație, voi simula un răspuns realist bazat pe date cunoscute
+    For demonstration purposes, simulate a realistic response based on known data
     """
-    # Deșeuri reale cunoscute din baza NASA Space-Track (includ mai multe la altitudini LEO)
+    # Real known debris from NASA Space-Track database (including more at LEO altitudes)
     known_debris = [
         {
             "norad_id": 36837,
@@ -115,24 +115,24 @@ def fetch_nasa_debris(limit: int = 200) -> List[Dict]:
         }
     ]
     
-    # Generez mai multe deșeuri bazate pe tipare reale
+    # Generate more debris based on real patterns
     debris_list = []
     for i in range(min(limit, 500)):
         base_debris = random.choice(known_debris)
         debris_item = base_debris.copy()
         
-        # Variez parametrii pentru a crea diversitate realistă
+        # Vary parameters to create realistic diversity
         debris_item["norad_id"] = base_debris["norad_id"] + i
         debris_item["name"] = f"{base_debris['name']} #{i+1:03d}"
         
-        # Variații realiste în parametri orbitali
+        # Realistic variations in orbital parameters
         debris_item["mean_motion"] += random.uniform(-0.5, 0.5)
         debris_item["inclination"] += random.uniform(-2, 2)
         debris_item["eccentricity"] += random.uniform(-0.02, 0.02)
         debris_item["apogee"] += random.randint(-100, 100)
         debris_item["perigee"] += random.randint(-50, 50)
         
-        # Poziție aproximativă calculată din parametri orbitali
+        # Approximate position calculated from orbital parameters
         debris_item["latitude"] = random.uniform(-debris_item["inclination"], debris_item["inclination"])
         debris_item["longitude"] = random.uniform(-180, 180)
         debris_item["altitude"] = (debris_item["apogee"] + debris_item["perigee"]) / 2
@@ -144,11 +144,11 @@ def fetch_nasa_debris(limit: int = 200) -> List[Dict]:
 
 def inclination_from_tle(line1: str, line2: str, name: str) -> float:
     """
-    Extrage înclinația orbitală din TLE (linia 2, caractere 9-16)
+    Extract orbital inclination from TLE (line 2, characters 9-16)
     Returns: inclination in degrees
     """
     try:
-        # Înclinația este în linia 2, poziția 9-16 (8 caractere)
+        # Inclination is in line 2, position 9-16 (8 characters)
         inc_str = line2[8:16].strip()
         return float(inc_str)
     except (ValueError, IndexError) as e:
@@ -158,7 +158,7 @@ def inclination_from_tle(line1: str, line2: str, name: str) -> float:
 
 def filter_debris_by_proximity(satellite_pos: Dict, debris_list: List[Dict], max_distance_km: float = 1000) -> List[Dict]:
     """
-    Filtrează deșeurile în funcție de proximitatea față de satelit cu calcul îmbunătățit
+    Filter debris based on proximity to satellite with improved calculation
     """
     filtered_debris = []
     
@@ -167,44 +167,44 @@ def filter_debris_by_proximity(satellite_pos: Dict, debris_list: List[Dict], max
     sat_lon = satellite_pos.get("longitude", 0)
     
     for debris in debris_list:
-        # Calculez distanța 3D în spațiu folosind coordonate carteziene
+        # Calculate 3D distance in space using Cartesian coordinates
         debris_alt = debris["altitude"]
         debris_lat = debris["latitude"]
         debris_lon = debris["longitude"]
         
-        # Convertesc coordonatele sferice în carteziene pentru calcul precis
+        # Convert spherical coordinates to Cartesian for precise calculation
         earth_radius = 6371  # km
         
-        # Satelit
+        # Satellite
         sat_r = earth_radius + sat_alt
         sat_x = sat_r * math.cos(math.radians(sat_lat)) * math.cos(math.radians(sat_lon))
         sat_y = sat_r * math.cos(math.radians(sat_lat)) * math.sin(math.radians(sat_lon))
         sat_z = sat_r * math.sin(math.radians(sat_lat))
         
-        # Deșeu
+        # Debris
         debris_r = earth_radius + debris_alt
         debris_x = debris_r * math.cos(math.radians(debris_lat)) * math.cos(math.radians(debris_lon))
         debris_y = debris_r * math.cos(math.radians(debris_lat)) * math.sin(math.radians(debris_lon))
         debris_z = debris_r * math.sin(math.radians(debris_lat))
         
-        # Distanța euclidiană în spațiu 3D
+        # Euclidean distance in 3D space
         distance_km = math.sqrt(
             (sat_x - debris_x)**2 + 
             (sat_y - debris_y)**2 + 
             (sat_z - debris_z)**2
         )
         
-        # Calculez viteza relativă pentru risc de impact
-        # Simplificat: viteza orbitală aproximativă
+        # Calculate relative velocity for impact risk
+        # Simplified: approximate orbital velocity
         sat_orbital_velocity = math.sqrt(398600 / sat_r)  # km/s
         debris_orbital_velocity = math.sqrt(398600 / debris_r)  # km/s
         relative_velocity = abs(sat_orbital_velocity - debris_orbital_velocity)
         
-        # Calculez factorul de risc îmbunătățit
+        # Calculate improved risk factor
         if distance_km <= max_distance_km:
-            # Risc bazat pe distanță și viteza relativă
+            # Risk based on distance and relative velocity
             risk_distance_factor = max(0, (max_distance_km - distance_km) / max_distance_km)
-            risk_velocity_factor = min(1, relative_velocity / 10)  # normalizez la 10 km/s max
+            risk_velocity_factor = min(1, relative_velocity / 10)  # normalize to 10 km/s max
             combined_risk = (risk_distance_factor * 0.7) + (risk_velocity_factor * 0.3)
             
             debris["distance_from_satellite_km"] = round(distance_km, 2)
@@ -236,7 +236,7 @@ def load_tle(req: LoadTLERequest):
             text = None
             error_messages = []
 
-            # Încearcă noul endpoint gp.php
+            # Try the new gp.php endpoint
             try:
                 r = requests.get(
                     "https://celestrak.org/NORAD/elements/gp.php",
@@ -250,7 +250,7 @@ def load_tle(req: LoadTLERequest):
             except Exception as exc:
                 error_messages.append(f"gp.php error: {exc}")
 
-            # Fallback la vechiul endpoint dacă noul nu merge
+            # Fallback to old endpoint if new one doesn't work
             if text is None:
                 legacy_url = f"https://celestrak.org/NORAD/elements/{group}.txt"
                 try:
@@ -325,14 +325,14 @@ def api_debris_nasa(
     proximity_km: float = Query(1000.0, ge=100.0, le=5000.0, description="Proximity filter radius in km"),
 ):
     """
-    Încarcă deșeuri spațiale reale din NASA Space-Track și filtrează doar pe cele din proximitatea satelitului
+    Load real space debris from NASA Space-Track and filter only those in proximity to the satellite
     """
     rec: Optional[TLERecord] = tle_store.get(norad_id)
     if not rec:
         raise HTTPException(status_code=404, detail=f"NORAD {norad_id} not found in TLE store.")
 
     try:
-        # Calculez poziția curentă a satelitului pentru filtrare
+        # Calculate current satellite position for filtering
         from skyfield.api import load, EarthSatellite
         ts = load.timescale()
         satellite = EarthSatellite(rec.line1, rec.line2, rec.name, ts)
@@ -346,16 +346,16 @@ def api_debris_nasa(
             "altitude_km": float(subpoint.elevation.km) if subpoint.elevation.km > 0 else 400
         }
         
-        # Încarcă toate deșeurile NASA disponibile
-        all_debris = fetch_nasa_debris(limit * 3)  # Încarc mai multe pentru filtrare
+        # Load all available NASA debris
+        all_debris = fetch_nasa_debris(limit * 3)  # Load more for filtering
         
-        # Filtrează doar deșeurile din proximitate
+        # Filter only debris in proximity
         nearby_debris = filter_debris_by_proximity(satellite_pos, all_debris, proximity_km)
         
-        # Limitez la numărul solicitat
+        # Limit to requested number
         filtered_debris = nearby_debris[:limit]
         
-        # Calculez riscurile de coliziune
+        # Calculate collision risks
         high_risk_count = 0
         collision_risks = []
         
@@ -372,7 +372,7 @@ def api_debris_nasa(
             elif distance < 500:
                 risk_level = "MEDIUM"
             
-            # Calculez probabilitatea de coliziune bazată pe distanță și mărime
+            # Calculate collision probability based on distance and size
             collision_prob = max(0, (1000 - distance) / 1000) * 0.001
             if debris.get("rcs_size") == "LARGE":
                 collision_prob *= 2
@@ -412,7 +412,7 @@ def api_debris_real(
     danger_zone_km: float = Query(15.0, ge=1.0, le=100.0, description="Danger zone radius in km"),
 ):
     """
-    Încarcă deșeuri spațiale reale din NASA Space-Track și calculează riscurile față de satelitul selectat
+    Load real space debris from NASA Space-Track and calculate risks relative to the selected satellite
     """
     import requests
     import math
@@ -422,7 +422,7 @@ def api_debris_real(
     if not rec:
         raise HTTPException(status_code=404, detail=f"NORAD {norad_id} not found in TLE store.")
 
-    # Propagă orbita satelitului pentru referință
+    # Propagate satellite orbit for reference
     start_time = datetime.now(timezone.utc)
     satellite_samples = propagate_positions(rec, start_time, minutes=120, step_seconds=60)
     
@@ -430,16 +430,16 @@ def api_debris_real(
         raise HTTPException(status_code=500, detail="Failed to propagate satellite orbit")
 
     try:
-        # Încarcă deșeuri reale din NASA Space-Track
-        # Nota: În producție ar trebui autentificare pentru Space-Track
-        # Pentru demo folosim endpoint-ul public cu limite
+        # Load real debris from NASA Space-Track
+        # Note: In production, authentication for Space-Track would be required
+        # For demo we use the public endpoint with limits
         space_track_url = "https://www.space-track.org/basicspacedata/query/class/tle_latest/OBJECT_TYPE/DEBRIS/MEAN_MOTION/%3E11/orderby/TLE_LINE1%20ASC/limit/{}/format/tle".format(limit)
         
-        # Pentru demo, simulăm datele Space-Track cu deșeuri realiste
+        # For demo, we simulate Space-Track data with realistic debris
         debris_objects = []
         collision_risks = []
         
-        # Generăm deșeuri bazate pe date statistice reale
+        # Generate debris based on real statistical data
         debris_types = [
             {"name": "SL-16 R/B FRAGMENT", "size_range": (5, 50), "velocity_offset": (-0.8, 0.8)},
             {"name": "FENGYUN 1C DEBRIS", "size_range": (1, 30), "velocity_offset": (-1.2, 1.2)},
@@ -448,7 +448,7 @@ def api_debris_real(
             {"name": "UNKNOWN FRAGMENT", "size_range": (1, 20), "velocity_offset": (-1.5, 1.5)},
         ]
         
-        # Calculăm poziția medie a satelitului pentru distribuția deșeurilor
+        # Calculate average satellite position for debris distribution
         if satellite_samples:
             avg_lat = sum(s["lat_deg"] for s in satellite_samples) / len(satellite_samples)
             avg_lon = sum(s["lon_deg"] for s in satellite_samples) / len(satellite_samples)
@@ -459,27 +459,27 @@ def api_debris_real(
         for i in range(limit):
             debris_type = debris_types[i % len(debris_types)]
             
-            # Distribuie deșeurile în zona orbitei satelitului cu variații realiste
-            lat_var = random.uniform(-15, 15)  # Variație latitudine ±15°
-            lon_var = random.uniform(-20, 20)  # Variație longitudine ±20°
-            alt_var = random.uniform(-200, 200)  # Variație altitudine ±200km
+            # Distribute debris in satellite orbit zone with realistic variations
+            lat_var = random.uniform(-15, 15)  # Latitude variation ±15°
+            lon_var = random.uniform(-20, 20)  # Longitude variation ±20°
+            alt_var = random.uniform(-200, 200)  # Altitude variation ±200km
             
             debris_lat = max(-90, min(90, avg_lat + lat_var))
             debris_lon = (avg_lon + lon_var) % 360
             if debris_lon > 180:
                 debris_lon -= 360
-            debris_alt = max(150, avg_alt + alt_var)  # Minimum 150km altitudine
+            debris_alt = max(150, avg_alt + alt_var)  # Minimum 150km altitude
             
             size_cm = random.uniform(*debris_type["size_range"])
             velocity_diff = random.uniform(*debris_type["velocity_offset"])
             
-            # Calculăm masa estimată bazată pe dimensiune (formula empirică)
+            # Calculate estimated mass based on size (empirical formula)
             mass_kg = (size_cm / 10) ** 2.5 * random.uniform(0.1, 2.0)
             
             debris_obj = {
                 "id": f"DEBRIS_{i+1:04d}",
                 "name": f"{debris_type['name']} #{i+1}",
-                "norad_id": f"90000{i+1:03d}",  # ID-uri simulate pentru deșeuri
+                "norad_id": f"90000{i+1:03d}",  # Simulated IDs for debris
                 "lat_deg": debris_lat,
                 "lon_deg": debris_lon,
                 "alt_km": debris_alt,
@@ -491,12 +491,12 @@ def api_debris_real(
                 "source": "NASA_SPACE_TRACK"
             }
             
-            # Calculăm distanța minimă față de satelit
+            # Calculate minimum distance from satellite
             min_distance_km = float('inf')
             closest_time = None
             
             for sample in satellite_samples:
-                # Distanța sferică (haversine) plus diferența de altitudine
+                # Spherical distance (haversine) plus altitude difference
                 dlat = math.radians(debris_lat - sample["lat_deg"])
                 dlon = math.radians(debris_lon - sample["lon_deg"])
                 a = (math.sin(dlat/2)**2 + 
@@ -512,11 +512,11 @@ def api_debris_real(
                     min_distance_km = distance_3d
                     closest_time = sample["t"]
             
-            # Clasificăm riscul îmbunătățit bazat pe proximitate, dimensiune și viteză
+            # Classify improved risk based on proximity, size, and velocity
             proximity_risk = debris_obj.get("proximity_risk_factor", 0)
             base_risk_factor = (size_cm * abs(velocity_diff)) / max(min_distance_km, 0.1)
             
-            # Combinăm factorul de risc tradițional cu cel de proximitate
+            # Combine traditional risk factor with proximity factor
             combined_risk_factor = (base_risk_factor * 0.6) + (proximity_risk * 100 * 0.4)
             
             if min_distance_km < danger_zone_km:
@@ -529,7 +529,7 @@ def api_debris_real(
                 else:
                     debris_obj["threat_level"] = "LOW"
                     
-                # Adăugăm la lista de riscuri
+                # Add to list of risks
                 collision_risks.append({
                     "debris_id": debris_obj["id"],
                     "debris_name": debris_obj["name"],
@@ -546,7 +546,7 @@ def api_debris_real(
             
             debris_objects.append(debris_obj)
         
-        # Sortăm riscurile după factorul de risc
+        # Sort risks by risk factor
         collision_risks.sort(key=lambda x: x["risk_factor"], reverse=True)
         
         return {
@@ -559,7 +559,7 @@ def api_debris_real(
                 "avg_longitude_deg": round(avg_lon, 3)
             },
             "debris": debris_objects,
-            "collision_risks": collision_risks[:20],  # Top 20 riscuri
+            "collision_risks": collision_risks[:20],  # Top 20 risks
             "danger_zone_km": danger_zone_km,
             "total_debris": len(debris_objects),
             "high_risk_debris": len([r for r in collision_risks if r["threat_level"] in ["HIGH", "CRITICAL"]]),
@@ -574,25 +574,25 @@ def api_debris_real(
 @app.get("/api/satellite/details")
 def api_satellite_details(norad_id: int = Query(..., description="NORAD catalog ID")):
     """
-    Returnează informații detaliate despre un satelit
+    Returns detailed information about a satellite
     """
     rec: Optional[TLERecord] = tle_store.get(norad_id)
     if not rec:
         raise HTTPException(status_code=404, detail=f"NORAD {norad_id} not found in TLE store.")
     
-    # Calculăm parametrii orbitali din TLE
+    # Calculate orbital parameters from TLE
     from skyfield.api import load, EarthSatellite
     
     try:
         ts = load.timescale()
         satellite = EarthSatellite(rec.line1, rec.line2, rec.name, ts)
         
-        # Calculăm orbita curentă
+        # Calculate current orbit
         now = ts.now()
         geocentric = satellite.at(now)
         subpoint = geocentric.subpoint()
         
-        # Extragem parametrii din TLE în mod sigur
+        # Extract parameters from TLE safely
         try:
             line2_parts = rec.line2.split()
             inclination = float(line2_parts[2]) if len(line2_parts) > 2 else 0
@@ -604,13 +604,13 @@ def api_satellite_details(norad_id: int = Query(..., description="NORAD catalog 
         except (ValueError, IndexError):
             inclination = raan = eccentricity = arg_perigee = mean_anomaly = mean_motion = 0
         
-        # Calculăm parametrii orbitali
+        # Calculate orbital parameters
         orbital_period_minutes = 1440 / mean_motion if mean_motion > 0 else 0
         
-        # Estimăm altitudinea din poziția curentă
+        # Estimate altitude from current position
         altitude_km = float(subpoint.elevation.km) if subpoint.elevation.km > 0 else 400  # fallback
         
-        # Returnăm un format simplificat pentru a evita probleme
+        # Return a simplified format to avoid issues
         return {
             "satellite_name": rec.name,
             "norad_id": norad_id,
@@ -637,7 +637,7 @@ def api_debris_simulate(
     danger_zone_km: float = Query(10.0, ge=1.0, le=100.0),
 ):
     """
-    Simulează deșeuri spațiale pe aceeași orbită cu satelitul și identifică potențiale coliziuni
+    Simulate space debris on the same orbit as the satellite and identify potential collisions
     """
     import random
     import math
@@ -646,32 +646,32 @@ def api_debris_simulate(
     if not rec:
         raise HTTPException(status_code=404, detail=f"NORAD {norad_id} not found in TLE store.")
 
-    # Propagă orbita satelitului
+    # Propagate satellite orbit
     start_time = dt.datetime.now(dt.timezone.utc)
     satellite_samples = propagate_positions(rec, start_time, minutes=minutes, step_seconds=60)
     
     if not satellite_samples:
         raise HTTPException(status_code=500, detail="Failed to propagate satellite orbit")
 
-    # Generează deșeuri simulate pe orbită
+    # Generate simulated debris on orbit
     debris_objects = []
     collision_risks = []
     
     for i in range(debris_count):
-        # Selectează un punct random de pe orbita satelitului
+        # Select a random point on the satellite orbit
         base_sample = random.choice(satellite_samples)
         
-        # Adaugă variație random pentru poziția deșeului
-        lat_offset = random.uniform(-2.0, 2.0)  # ±2 grade latitudine
-        lon_offset = random.uniform(-2.0, 2.0)  # ±2 grade longitudine  
-        alt_offset = random.uniform(-5.0, 5.0)  # ±5 km altitudine
+        # Add random variation for debris position
+        lat_offset = random.uniform(-2.0, 2.0)  # ±2 degrees latitude
+        lon_offset = random.uniform(-2.0, 2.0)  # ±2 degrees longitude  
+        alt_offset = random.uniform(-5.0, 5.0)  # ±5 km altitude
         
         debris_lat = base_sample["lat_deg"] + lat_offset
         debris_lon = base_sample["lon_deg"] + lon_offset
         debris_alt = base_sample["alt_km"] + alt_offset
         
-        # Simulează mișcarea deșeului cu viteze random
-        velocity_offset = random.uniform(-0.5, 0.5)  # km/s diferență de viteză
+        # Simulate debris motion with random velocities
+        velocity_offset = random.uniform(-0.5, 0.5)  # km/s velocity difference
         
         debris_obj = {
             "id": f"DEBRIS_{i:03d}",
@@ -778,22 +778,22 @@ def api_risk_ordem(
         flux = flux_ordem_like(alt_km, inc_deg, size_min_cm, size_max_cm)  # #/m^2/year
         years = duration_days / 365.0
         prob = annual_collision_probability(area_m2, years, flux)
-        # Calculează categorii de risc pentru explicații
-        risk_level = "Redus"
-        risk_explanation = "Probabilitatea de coliziune este foarte scăzută."
+        # Calculate risk categories for explanations
+        risk_level = "Low"
+        risk_explanation = "The collision probability is very low."
         
         if prob > 0.1:
-            risk_level = "Critic"
-            risk_explanation = "Probabilitate foarte mare de coliziune! Necesită monitorizare constantă și posibile manevre de evitare."
+            risk_level = "Critical"
+            risk_explanation = "Very high collision probability! Requires constant monitoring and possible avoidance maneuvers."
         elif prob > 0.01:
-            risk_level = "Înalt"
-            risk_explanation = "Probabilitate semnificativă de coliziune. Monitorizare intensificată recomandată."
+            risk_level = "High"
+            risk_explanation = "Significant collision probability. Enhanced monitoring recommended."
         elif prob > 0.001:
-            risk_level = "Moderat"
-            risk_explanation = "Probabilitate moderată de coliziune. Monitorizare regulată necesară."
+            risk_level = "Moderate"
+            risk_explanation = "Moderate collision probability. Regular monitoring required."
         
-        # Explicații despre flux-ul de deșeuri
-        flux_explanation = f"La altitudinea de {alt_km} km, fluxul mediu de deșeuri spațiale cu dimensiuni între {size_min_cm}-{size_max_cm} cm este de {flux:.6f} impacturi per m² per an."
+        # Explanations about debris flux
+        flux_explanation = f"At an altitude of {alt_km} km, the average flux of space debris with sizes between {size_min_cm}-{size_max_cm} cm is {flux:.6f} impacts per m² per year."
         
         return {
             "norad_id": norad_id,
@@ -809,9 +809,9 @@ def api_risk_ordem(
             "risk_explanation": risk_explanation,
             "flux_explanation": flux_explanation,
             "recommendations": {
-                "monitoring": "Monitorizare prin radar și optică",
-                "maneuver": "Manevre de evitare dacă probabilitatea > 1%",
-                "shielding": "Protecție anti-deșeuri pentru componente critice"
+                "monitoring": "Monitoring via radar and optical systems",
+                "maneuver": "Avoidance maneuvers if probability > 1%",
+                "shielding": "Anti-debris protection for critical components"
             }
         }
     except Exception as e:
@@ -821,7 +821,7 @@ def api_risk_ordem(
 @app.get("/api/debris/real-data")
 def api_debris_real_data(limit: int = Query(200, le=500)):
     """
-    Returnează date reale despre deșeuri spațiale din NASA Space-Track
+    Returns real data about space debris from NASA Space-Track
     """
     try:
         debris_list = fetch_nasa_debris(limit)
@@ -838,15 +838,15 @@ def api_debris_real_data(limit: int = Query(200, le=500)):
 @app.get("/api/debris/risk-zones")
 def api_debris_risk_zones():
     """
-    Calculează zonele cu risc ridicat folosind DATE OFICIALE NASA ORDEM
-    Bazat pe flux de debris raportat la suprafața orbitală (impacts/m²/year)
-    Sursa: https://orbitaldebris.jsc.nasa.gov/
+    Calculate high risk zones using OFFICIAL NASA ORDEM DATA
+    Based on debris flux reported to orbital surface (impacts/m²/year)
+    Source: https://orbitaldebris.jsc.nasa.gov/
     """
     try:
         import csv
         import os
         
-        # Citește datele NASA ORDEM din CSV
+        # Read NASA ORDEM data from CSV
         ordem_file = os.path.join(os.path.dirname(__file__), '..', 'data', 'ordem_flux_sample.csv')
         ordem_data = []
         
@@ -861,7 +861,7 @@ def api_debris_risk_zones():
                     'flux_per_m2_per_year': float(row['flux_per_m2_per_year'])
                 })
         
-        # Grupează pe altitudine și calculează flux total
+        # Group by altitude and calculate total flux
         altitude_flux = {}
         for entry in ordem_data:
             alt = entry['altitude_km']
@@ -875,31 +875,31 @@ def api_debris_risk_zones():
             altitude_flux[alt]['total_flux'] += entry['flux_per_m2_per_year']
             altitude_flux[alt]['entries'].append(entry)
             
-            # Grupează și pe inclinație pentru a identifica orbite populare
+            # Group by inclination to identify popular orbits
             inc = entry['inclination_deg']
             if inc not in altitude_flux[alt]['flux_by_inclination']:
                 altitude_flux[alt]['flux_by_inclination'][inc] = 0
             altitude_flux[alt]['flux_by_inclination'][inc] += entry['flux_per_m2_per_year']
         
-        # Calculează densitatea pe SUPRAFAȚĂ pentru fiecare altitudine
+        # Calculate SURFACE density for each altitude
         risk_zones_data = []
         for alt, data in altitude_flux.items():
-            # Raza la această altitudine (m)
+            # Radius at this altitude (m)
             radius_m = (6371 + alt) * 1000
-            # Suprafața sferei (m²)
+            # Sphere surface area (m²)
             surface_area_m2 = 4 * 3.14159 * (radius_m ** 2)
             
-            # Debris estimat pe întreaga suprafață (obiecte/an)
+            # Estimated debris on entire surface (objects/year)
             total_debris_per_year = data['total_flux'] * surface_area_m2
             
-            # Densitate pe suprafață (debris/km²)
+            # Surface density (debris/km²)
             surface_area_km2 = surface_area_m2 / 1e6
             debris_per_km2 = total_debris_per_year / surface_area_km2
             
-            # Găsește inclinația dominantă
+            # Find dominant inclination
             dominant_inc = max(data['flux_by_inclination'].items(), key=lambda x: x[1])[0]
             
-            # Categorisire orbită
+            # Orbit categorization
             orbit_type = "LEO"
             if dominant_inc > 80:
                 orbit_type = "Polar/Sun-Sync"

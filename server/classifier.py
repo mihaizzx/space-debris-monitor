@@ -14,15 +14,15 @@ CATEGORIES = ["panel_solar", "fragment_metalic", "fragment_compozit", "adaptor_s
 
 def classify_image(img_bytes: io.BytesIO) -> Tuple[str, float, Dict[str, Any]]:
     """
-    Clasifică o imagine de deșeu spațial în categorii.
-    Fallback simplu dacă OpenCV nu este disponibil.
+    Classify a space debris image into categories.
+    Simple fallback if OpenCV is not available.
     """
     if not CV2_AVAILABLE:
-        # Fallback simplu fără OpenCV
+        # Simple fallback without OpenCV
         img = Image.open(img_bytes)
         width, height = img.size
         
-        # Clasificare simplă bazată pe aspect ratio
+        # Simple classification based on aspect ratio
         aspect_ratio = width / height if height > 0 else 1.0
         
         if aspect_ratio > 2.5:
@@ -32,7 +32,7 @@ def classify_image(img_bytes: io.BytesIO) -> Tuple[str, float, Dict[str, Any]]:
         else:
             return "adaptor_structural", 0.5, {"image_size": [width, height], "aspect_ratio": aspect_ratio}
     
-    # Cod original cu OpenCV
+    # Original code with OpenCV
     img = Image.open(img_bytes)
     img_np = np.array(img.convert("RGB"))
     h, w = img_np.shape[:2]

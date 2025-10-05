@@ -314,20 +314,20 @@ class EventManager {
         
         console.log('NASA debris data:', debrisData);
         
-        // Vizualizează deșeurile
+        // Visualize debris
         if (window.CesiumManager && window.CesiumManager.viewer) {
           const viewer = window.CesiumManager.viewer;
           
-          // Șterge deșeurile anterioare
+          // Delete previous debris
           if (window.CesiumManager.clearDebris) {
             window.CesiumManager.clearDebris();
           }
           
-          // Adaugă deșeurile noi
+          // Add new debris
           const AppState = window.AppState || { debrisEntities: [] };
           AppState.debrisEntities = AppState.debrisEntities || [];
           
-          // Setează clock-ul o singură dată ÎNAINTE de loop (pentru animație)
+          // Set the clock only once BEFORE the loop (for animation)
           if (withMotion) {
             const startTime = Cesium.JulianDate.now();
             const simulationDuration = 7200; // 2 ore

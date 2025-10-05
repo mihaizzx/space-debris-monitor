@@ -67,17 +67,17 @@
       AppState.viewer = viewer;
       window.viewer = viewer; // For backward compatibility
 
-      // Adaugă event listener pentru click pe entități - afișează info panel extins
+      // Add event listener for entity clicks - display extended info panel
       viewer.selectedEntityChanged.addEventListener(function(selectedEntity) {
         if (selectedEntity && selectedEntity.properties && selectedEntity.properties.norad_id) {
           const noradId = selectedEntity.properties.norad_id;
           console.log('Entity clicked, fetching full info for NORAD:', noradId);
           
-          // Fetch informații complete despre satelit
+          // Fetch complete satellite information
           fetch(`${CONFIG.API_BASE_URL}/api/satellite/info/${noradId}`)
             .then(response => response.json())
             .then(info => {
-              // Creează HTML pentru info panel extins
+              // Create HTML for extended info panel
               const htmlContent = `
                 <div style="max-width: 500px; font-family: Arial, sans-serif;">
                   <h2 style="color: #0078d4; margin-top: 0;">${info.basic_info.name}</h2>
@@ -142,7 +142,7 @@
                 </div>
               `;
               
-              // Setează descrierea entității pentru a afișa în info panel
+              // Set entity description to display in info panel
               selectedEntity.description = htmlContent;
             })
             .catch(error => {
