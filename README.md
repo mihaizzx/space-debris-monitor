@@ -1,5 +1,3 @@
-# space-debris-monitor
-
 # 🛰️ Space Debris Tracker - NASA Demo
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
@@ -8,6 +6,8 @@
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 > **Advanced 3D visualization and analysis platform for tracking space debris and satellites using real NASA data and SGP4 orbital propagation.**
+
+![Space Debris Tracker Demo](https://via.placeholder.com/800x400/0a0e27/4a90e2?text=Space+Debris+Tracker+Demo)
 
 ---
 
@@ -48,13 +48,13 @@
 ### Installation
 
 1. **Clone the repository:**
-bash
+```bash
 git clone https://github.com/YOUR_USERNAME/space-debris-nasa-demo.git
 cd space-debris-nasa-demo
-
+```
 
 2. **Create virtual environment:**
-bash
+```bash
 python -m venv .venv
 
 # Windows
@@ -62,13 +62,25 @@ python -m venv .venv
 
 # Linux/Mac
 source .venv/bin/activate
-
+```
 
 3. **Install Python dependencies:**
-bash
-pip intall -r requirements.txt
+```bash
+pip install -r requirements.txt
+```
 
+4. **Start the server:**
+```bash
+cd server
+python main.py
+```
 
+5. **Open in browser:**
+```
+http://127.0.0.1:8001
+```
+
+---
 
 ## 📖 Usage Guide
 
@@ -173,11 +185,11 @@ GET https://api.nasa.gov/DONKI/CME?startDate={date}&api_key={key}
 - Geomagnetic Storms (GST)
 
 ### 4. Skyfield (SGP4 Propagator)
-python
+```python
 from skyfield.api import EarthSatellite, load, wgs84
 sat = EarthSatellite(line1, line2, name, ts)
 geocentric = sat.at(t)
-
+```
 - Precise orbital calculations from TLE data
 - WGS84 coordinate transformations
 
@@ -186,7 +198,7 @@ geocentric = sat.at(t)
 ## 📐 Mathematical Formulas
 
 ### SGP4 Orbital Propagation
-
+```
 Position at time t:
 r(t) = [x(t), y(t), z(t)]
 
@@ -196,20 +208,20 @@ Calculated through:
 3. Solve Kepler's equation: M = E - e·sin(E)
 4. Convert to Cartesian coordinates
 5. Apply perturbations (J₂, drag, etc.)
-
+```
 
 ### Collision Probability
-
+```
 P_annual = 1 - exp(-F × A × T)
 
 Where:
 F = debris flux (impacts/m²/year) from NASA ORDEM
 A = satellite cross-sectional area (m²)
 T = time period (years)
-
+```
 
 ### Orbital Velocity
-
+```
 v = √(μ / r)
 
 Where:
@@ -220,7 +232,7 @@ Examples:
 - ISS (400 km): 7.67 km/s
 - GPS (20,200 km): 3.87 km/s
 - GEO (35,786 km): 3.07 km/s
-
+```
 
 ---
 
@@ -265,7 +277,7 @@ Examples:
 ## 🧪 Testing
 
 ### Load Sample Data
-bash
+```bash
 # Start server
 cd server
 python main.py
@@ -274,7 +286,7 @@ python main.py
 1. Click "Load TLE Data" → Select "Active Satellites"
 2. Select "All Satellites" → Check "Show with real SGP4 orbits"
 3. Click "Visualize Selected"
-
+```
 
 ### Test Impact Prediction
 ```bash
@@ -311,16 +323,16 @@ const CONFIG = {
 ## 🐛 Troubleshooting
 
 ### Issue: Server won't start
-bash
- Check if port 8001 is already in use
+```bash
+# Check if port 8001 is already in use
 netstat -ano | findstr :8001
 
- Kill the process (Windows)
+# Kill the process (Windows)
 taskkill /F /PID <PID>
 
- Kill the process (Linux/Mac)
+# Kill the process (Linux/Mac)
 kill -9 <PID>
-
+```
 
 ### Issue: No satellites visible
 1. Ensure TLE data is loaded (check console for "TLE data loaded" message)
@@ -350,6 +362,17 @@ Includes:
 
 ---
 
+## 🤝 Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
 
 ## 📜 License
 
@@ -367,6 +390,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+## 📞 Contact
+
+**Author**: Your Name  
+**Email**: your.email@example.com  
+**GitHub**: [@your-username](https://github.com/your-username)  
+**Project Link**: [https://github.com/your-username/space-debris-nasa-demo](https://github.com/your-username/space-debris-nasa-demo)
+
+---
 
 ## 📈 Future Improvements
 
