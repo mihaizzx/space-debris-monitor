@@ -1,13 +1,14 @@
-# Context și rezumat
+Context and Summary
+Use NASA DONKI data for space-weather context (Kp), which affects atmospheric density in LEO and maneuver/deorbit windows.
+Use the NASA ODPO/ORDEM model for statistical debris fluxes (in demo: “ORDEM-like” CSV grid). For production, replace with real ORDEM 3.2/4.0.
+TLEs come from CelesTrak (public) or Space-Track (account required). NASA does not provide a fully public TLE API for debris.
 
-- Folosește date NASA DONKI pentru context space‑weather (Kp), care afectează densitatea atmosferică în LEO și ferestrele de manevră/deorbit.
-- Folosește modelul NASA ODPO/ORDEM pentru fluxurile statistice de deșeuri (în demo: grid „ORDEM‑like” CSV). Pentru producție, înlocuiește cu ORDEM 3.2/4.0 real.
-- TLE-urile vin din CelesTrak (public) sau Space-Track (cont). NASA nu oferă un API TLE public complet pentru debris.
+Workflow:
 
-Flux:
-1) Încarci TLE → 2) Propagi orbita (SGP4) → 3) Interoghezi DONKI (Kp) → 4) Calculezi risc (flux + Poisson) → 5) Vizualizezi 3D → 6) (opțional) Clasifici imagini cu ML.
+Load TLE → 2) Propagate orbit (SGP4) → 3) Query DONKI (Kp) → 4) Compute risk (flux + Poisson) → 5) Visualize in 3D → 6) (optional) Classify images with ML.
 
-Justificare utilizare date:
-- ORDEM (ODPO/NASA): standardul pentru evaluarea riscului și prioritzare ținte ADR.
-- DONKI: evenimente geomagnetice influențează drag-ul → timpii de re-intrare și Δv.
-- TLE: necesare pentru evitare coliziuni și navigație (Space-Track/CelesTrak).
+Data usage justification:
+
+ORDEM (ODPO/NASA): the standard for risk assessment and ADR target prioritization.
+DONKI: geomagnetic events influence drag → re-entry times and Δv.
+TLE: necessary for collision avoidance and navigation (Space-Track/CelesTrak).

@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ro">
+<html lang="en">
 <head>
   <meta charset="utf-8"/>
   <title>Space Debris NASA Demo - 3D</title>
@@ -20,8 +20,10 @@
       display: flex;
       height: 100vh;
     }
-
-    .sidebar {
+      <button id="btnShowNASARiskZones" class="btn btn-info" data-action="showNASARiskZones">
+        <span class="btn-icon">🚨</span>
+        High Risk Zones (Debris Density)
+      </button> .sidebar {
       width: 280px;
       height: 100vh;
       background: linear-gradient(135deg, #1a1a2e, #16213e);
@@ -657,9 +659,9 @@
           <option value="leo-boundary">🔴 Toggle LEO Boundary</option>
         </select>
         
-        <!-- Dynamic Settings Panel (se va afișa în funcție de selecție) -->
+        <!-- Dynamic Settings Panel (will be displayed based on selection) -->
         <div id="satelliteSettings" style="display: none;">
-          <!-- Settings vor fi inserate dinamic -->
+          <!-- Settings will be inserted dynamically -->
         </div>
         
         <button id="btnShowSatellites" class="btn btn-primary" data-action="showSelectedSatellites" style="width: 100%;">
