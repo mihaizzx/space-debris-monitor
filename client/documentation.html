@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>📚 Documentation - Space Debris Tracker</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cesium@1.122/Build/Cesium/Widgets/widgets.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #2a1f3a 100%);
+      color: #e0e0e0;
+      line-height: 1.6;
+    }
+
+    .header {
+      background: rgba(10, 14, 39, 0.95);
+      border-bottom: 2px solid #4a90e2;
+      padding: 20px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      color: #4a90e2;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: #4a90e2;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      transition: all 0.3s;
+      border: 1px solid transparent;
+    }
+
+    .nav-links a:hover {
+      background: rgba(74, 144, 226, 0.2);
+      border-color: #4a90e2;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 20px;
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 10px;
+      padding: 30px;
+      margin-bottom: 30px;
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      backdrop-filter: blur(5px);
+    }
+
+    .section h2 {
+      color: #4a90e2;
+      font-size: 24px;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid rgba(74, 144, 226, 0.5);
+    }
+
+    .section h3 {
+      color: #6ab7ff;
+      font-size: 20px;
+      margin-top: 25px;
+      margin-bottom: 15px;
+    }
+
+    .api-card {
+      background: rgba(74, 144, 226, 0.1);
+      border-left: 4px solid #4a90e2;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 5px;
+    }
+
+    .api-card h4 {
+      color: #4a90e2;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+
+    .api-endpoint {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px 15px;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      color: #7fff7f;
+      margin: 10px 0;
+      overflow-x: auto;
+    }
+
+    .math-formula {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      border-left: 4px solid #ffd700;
+      padding: 20px;
+      margin: 15px 0;
+      border-radius: 5px;
+      font-family: 'Courier New', monospace;
+      overflow-x: auto;
+    }
+
+    .math-formula h4 {
+      color: #ffd700;
+      font-size: 16px;
+      margin-bottom: 10px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .formula-text {
+      color: #ffeb3b;
+      font-size: 16px;
+      line-height: 1.8;
+      margin: 10px 0;
+    }
+
+    .step-list {
+      counter-reset: step-counter;
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .step-list li {
+      counter-increment: step-counter;
+      margin: 15px 0;
+      padding-left: 40px;
+      position: relative;
+    }
+
+    .step-list li::before {
+      content: counter(step-counter);
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: #4a90e2;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .feature-card {
+      background: rgba(74, 144, 226, 0.1);
+      border: 1px solid rgba(74, 144, 226, 0.3);
+      border-radius: 8px;
+      padding: 20px;
+      transition: transform 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: #4a90e2;
+    }
+
+    .feature-card h4 {
+      color: #4a90e2;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .warning-box {
+      background: rgba(255, 152, 0, 0.1);
+      border-left: 4px solid #ff9800;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 5px;
+    }
+
+    .info-box {
+      background: rgba(33, 150, 243, 0.1);
+      border-left: 4px solid #2196f3;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 5px;
+    }
+
+    .success-box {
+      background: rgba(76, 175, 80, 0.1);
+      border-left: 4px solid #4caf50;
+      padding: 15px;
+      margin: 15px 0;
+      border-radius: 5px;
+    }
+
+    code {
+      background: rgba(0, 0, 0, 0.3);
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #7fff7f;
+      font-family: 'Courier New', monospace;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      margin: 20px 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(74, 144, 226, 0.2);
+    }
+
+    th {
+      background: rgba(74, 144, 226, 0.2);
+      color: #4a90e2;
+      font-weight: bold;
+    }
+
+    tr:hover {
+      background: rgba(74, 144, 226, 0.1);
+    }
+
+    .toc {
+      background: rgba(74, 144, 226, 0.1);
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 30px;
+    }
+
+    .toc h3 {
+      color: #4a90e2;
+      margin-bottom: 15px;
+    }
+
+    .toc ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .toc li {
+      margin: 8px 0;
+    }
+
+    .toc a {
+      color: #6ab7ff;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    .toc a:hover {
+      color: #4a90e2;
+      text-decoration: underline;
+    }
+
+    .button-link {
+      display: inline-block;
+      background: #4a90e2;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background 0.3s;
+      margin: 10px 5px;
+    }
+
+    .button-link:hover {
+      background: #357abd;
+    }
+
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .nav-links {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <h1>📚 Space Debris Tracker - Documentation</h1>
+      <nav class="nav-links">
+        <a href="/">🏠 Home</a>
+        <a href="#guide">📖 Guide</a>
+        <a href="#apis">🔗 APIs</a>
+        <a href="#math">📐 Math</a>
+      </nav>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- Table of Contents -->
+    <div class="toc">
+      <h3>📋 Cuprins / Table of Contents</h3>
+      <ul>
+        <li><a href="#overview">🌍 Prezentare Generală</a></li>
+        <li><a href="#guide">📖 Ghid de Utilizare</a></li>
+        <li><a href="#features">✨ Funcționalități</a></li>
+        <li><a href="#apis">🔗 API-uri NASA</a></li>
+        <li><a href="#math">📐 Calcule Matematice</a></li>
+        <li><a href="#technical">⚙️ Detalii Tehnice</a></li>
+      </ul>
+    </div>
+
+    <!-- Overview Section -->
+    <div class="section" id="overview">
+      <h2>🌍 Prezentare Generală</h2>
+      <p>
+        <strong>Space Debris Tracker</strong> este o aplicație web avansată pentru monitorizarea și analiza deșeurilor spațiale în orbita Pământului. 
+        Utilizează date reale de la NASA și algoritmi de propagare orbitală SGP4 pentru a oferi o vizualizare 3D precisă a sateliților și deșeurilor spațiale.
+      </p>
+      
+      <div class="info-box">
+        <strong>🎯 Scop:</strong> Să ofere oricui acces la date critice despre deșeurile spațiale și să ajute la înțelegerea riscurilor asociate cu obiectele orbitale.
+      </div>
+
+      <h3>🚀 Tehnologii Utilizate</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>🌐 Frontend</h4>
+          <ul>
+            <li><strong>Cesium.js 1.122</strong> - Vizualizare 3D</li>
+            <li><strong>JavaScript ES6+</strong> - Logică aplicație</li>
+            <li><strong>HTML5/CSS3</strong> - Interfață modernă</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h4>🔧 Backend</h4>
+          <ul>
+            <li><strong>FastAPI (Python)</strong> - REST API</li>
+            <li><strong>Skyfield</strong> - Propagare SGP4</li>
+            <li><strong>NumPy</strong> - Calcule științifice</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h4>📊 Surse de Date</h4>
+          <ul>
+            <li><strong>CelesTrak</strong> - Date TLE</li>
+            <li><strong>NASA ORDEM</strong> - Flux deșeuri</li>
+            <li><strong>Space-Track.org</strong> - Catalog obiecte</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- User Guide Section -->
+    <div class="section" id="guide">
+      <h2>📖 Ghid de Utilizare Completă</h2>
+      
+      <h3>🎬 Pași Inițiali</h3>
+      <ol class="step-list">
+        <li>
+          <strong>Încărcați Date TLE</strong><br>
+          Click pe butonul <code>📡 Load TLE Data</code> din sidebar pentru a descărca datele cele mai recente de la CelesTrak.
+          <div class="info-box" style="margin-top: 10px;">
+            <strong>Opțiuni disponibile:</strong>
+            <ul>
+              <li>🛰️ Active Satellites - Sateliți activi (~3000 obiecte)</li>
+              <li>🌦️ Weather Satellites - Sateliți meteorologici</li>
+              <li>📡 Communications - Sateliți de comunicații</li>
+              <li>🔭 Science - Sateliți științifici</li>
+              <li>🌍 Earth Observation - Observarea Pământului</li>
+            </ul>
+          </div>
+        </li>
+
+        <li>
+          <strong>Vizualizați Sateliții</strong><br>
+          Selectați tipul de vizualizare din dropdown-ul <code>🛰️ Visualize Satellites</code>:
+          <ul style="margin-top: 10px;">
+            <li><strong>🌐 All Satellites</strong> - Toți sateliții (mixt LEO + Non-LEO)</li>
+            <li><strong>🌍 LEO Satellites</strong> - Doar sateliți LEO (&lt;2000km)</li>
+            <li><strong>🌌 Non-LEO Satellites</strong> - Sateliți MEO/GEO (&gt;2000km)</li>
+            <li><strong>🔴 Toggle LEO Boundary</strong> - Afișează limita LEO</li>
+          </ul>
+        </li>
+
+        <li>
+          <strong>Configurați Setările</strong><br>
+          După selectarea tipului, apare un panel cu opțiuni:
+          <ul style="margin-top: 10px;">
+            <li><strong>Number of satellites:</strong> Câți sateliți să afișeze (5-100)</li>
+            <li><strong>☑️ Show with real SGP4 orbits:</strong> Afișează traiectorii animate (mai lent)</li>
+          </ul>
+          <div class="warning-box" style="margin-top: 10px;">
+            ⚠️ Vizualizarea cu orbite reale poate dura 10-30 secunde pentru multe sateliți!
+          </div>
+        </li>
+
+        <li>
+          <strong>Click "👁️ Visualize Selected"</strong><br>
+          Sateliții vor apărea pe glob cu culori distinctive:
+          <ul style="margin-top: 10px;">
+            <li><strong style="color: #00ffff;">🌈 Curcubeu</strong> - All Satellites (gradient colorat)</li>
+            <li><strong style="color: #00ffff;">🌊 AQUA</strong> - LEO Satellites (albastru-verde strălucitor)</li>
+            <li><strong style="color: #ff8c00;">🟠 DARKORANGE</strong> - Non-LEO Satellites (portocaliu + galben)</li>
+          </ul>
+        </li>
+
+        <li>
+          <strong>Interacționați cu Globul 3D</strong><br>
+          <ul style="margin-top: 10px;">
+            <li><strong>Click stânga + drag:</strong> Rotește globul</li>
+            <li><strong>Scroll:</strong> Zoom in/out</li>
+            <li><strong>Click dreapta + drag:</strong> Pan (mută camera)</li>
+            <li><strong>Click pe satelit:</strong> Afișează detalii (NORAD ID, altitudine, viteză)</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h3>🚨 Funcții Avansate</h3>
+      
+      <h4>📍 Propagare Orbitală (SGP4)</h4>
+      <p>
+        Selectați un satelit din dropdown și click pe <code>🌍 Propagate Orbit</code> pentru a vizualiza traiectoria precisă calculată cu algoritmul SGP4 NASA.
+      </p>
+      <div class="info-box">
+        <strong>⏱️ Parametri:</strong>
+        <ul>
+          <li><strong>Minutes:</strong> Durata propagării (default: 120 minute = 2 ore)</li>
+          <li><strong>Step (seconds):</strong> Intervalul între puncte (default: 60s)</li>
+        </ul>
+      </div>
+
+      <h4>⚠️ Zone de Risc NASA ORDEM</h4>
+      <p>
+        Click pe <code>🚨 NASA Risk Zones</code> pentru a afișa 5 zone de risc bazate pe datele NASA ORDEM (Orbital Debris Engineering Model):
+      </p>
+      <ul>
+        <li><strong style="color: #ff0000;">🔴 CRITICAL</strong> - 400 km (LEO inferior - ISS)</li>
+        <li><strong style="color: #ff4500;">🟠 VERY HIGH</strong> - 800 km (LEO mijlociu - Iridium)</li>
+        <li><strong style="color: #ffa500;">🟡 HIGH</strong> - 1400 km (LEO superior - Earth observation)</li>
+        <li><strong style="color: #ffff00;">🟢 MODERATE</strong> - 20200 km (MEO - GPS)</li>
+        <li><strong style="color: #90ee90;">🔵 ELEVATED</strong> - 35786 km (GEO - Comunicații)</li>
+      </ul>
+      <div class="success-box">
+        <strong>💡 Tip:</strong> Click pe primul punct din fiecare orbită pentru a vedea datele complete NASA ORDEM pentru acea zonă!
+      </div>
+
+      <h4>🎯 Predicție de Impact</h4>
+      <ol style="margin-top: 10px;">
+        <li>Selectați un satelit din dropdown</li>
+        <li>Click pe <code>🎯 Predict Impact</code></li>
+        <li>Veți primi:
+          <ul>
+            <li>Poziția curentă a satelitului</li>
+            <li>Numărul total de deșeuri urmărite (300)</li>
+            <li>Deșeuri în apropiere (rază 2000 km)</li>
+            <li>Top 5 deșeuri cu risc de coliziune</li>
+            <li>Probabilități de coliziune calculate</li>
+            <li>Distanțe și viteze relative</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h4>📊 Analiză de Risc Personalizată</h4>
+      <p>Calculați probabilitatea de coliziune pentru satelitul dvs.:</p>
+      <ol style="margin-top: 10px;">
+        <li>Introduceți parametrii:
+          <ul>
+            <li><strong>Area m²:</strong> Suprafața satelitului (ex: 10 m²)</li>
+            <li><strong>Days:</strong> Perioada de analiză (ex: 365 zile = 1 an)</li>
+            <li><strong>Min/Max cm:</strong> Dimensiunea deșeurilor (ex: 1-10 cm)</li>
+          </ul>
+        </li>
+        <li>Selectați un satelit din dropdown (pentru a obține altitudinea)</li>
+        <li>Click pe <code>⚠️ Risk Analysis</code></li>
+        <li>Rezultatul va afișa:
+          <ul>
+            <li>Fluxul mediu de deșeuri (impacts/m²/year)</li>
+            <li>Probabilitatea anuală de coliziune</li>
+            <li>Risc cumulat în perioada selectată</li>
+          </ul>
+        </li>
+      </ol>
+
+      <h4>☀️ Vreme Spațială (Space Weather)</h4>
+      <p>
+        Click pe <code>☀️ Space Weather</code> pentru a obține evenimente solare recente de la NASA DONKI API:
+      </p>
+      <ul>
+        <li><strong>CME</strong> - Coronal Mass Ejections (ejecții de masă coronală)</li>
+        <li><strong>Solar Flares</strong> - Erupții solare</li>
+        <li><strong>Geomagnetic Storms</strong> - Furtuni geomagnetice</li>
+      </ul>
+      <div class="warning-box">
+        ⚠️ Vremea spațială poate afecta sateliții prin interferențe radio, degradarea panourilor solare și creșterea frecării atmosferice!
+      </div>
+
+      <h4>🔍 Clasificare Imagini (ML)</h4>
+      <p>
+        Încărcați o imagine cu sateliți sau deșeuri spațiale pentru clasificare automată (funcționalitate demonstrativă).
+      </p>
+    </div>
+
+    <!-- Features Section -->
+    <div class="section" id="features">
+      <h2>✨ Funcționalități Complete</h2>
+      
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Funcționalitate</th>
+              <th>Descriere</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>📡 Încărcare TLE</td>
+              <td>Descarcă date TLE de la CelesTrak (6 categorii)</td>
+              <td>✅ Funcțional</td>
+            </tr>
+            <tr>
+              <td>🌐 Vizualizare 3D</td>
+              <td>Afișează sateliți pe glob Cesium cu culori distinctive</td>
+              <td>✅ Funcțional</td>
+            </tr>
+            <tr>
+              <td>🛰️ Propagare SGP4</td>
+              <td>Calculează traiectorii precise folosind algoritmul NASA</td>
+              <td>✅ Funcțional</td>
+            </tr>
+            <tr>
+              <td>🎬 Animație Orbite</td>
+              <td>Animație time-lapse 60x cu SampledPositionProperty</td>
+              <td>✅ Funcțional</td>
+            </tr>
+            <tr>
+              <td>🚨 Zone Risc NASA</td>
+              <td>5 zone bazate pe NASA ORDEM cu flux real</td>
+              <td>✅ Funcțional</td>
+            </tr>
+            <tr>
+              <td>🎯 Predicție Impact</td>
+              <td>Analiză coliziuni cu top 5 deșeuri periculoase</td>
+              <td>✅ Funcțional</td>
+            </tr>
+            <tr>
+              <td>⚠️ Analiză Risc</td>
+              <td>Calcul probabilități personalizate</td>
+              <td>✅ Funcțional</td>
+            </tr>
+            <tr>
+              <td>☀️ Space Weather</td>
+              <td>Date NASA DONKI (CME, solar flares)</td>
+              <td>✅ Funcțional</td>
+            </tr>
+            <tr>
+              <td>🔍 Clasificare ML</td>
+              <td>Machine learning pentru imagini sateliți</td>
+              <td>🚧 Demo</td>
+            </tr>
+            <tr>
+              <td>🔴 Limită LEO</td>
+              <td>Vizualizare sferă delimitare LEO (2000km)</td>
+              <td>🔄 În dezvoltare</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- NASA APIs Section -->
+    <div class="section" id="apis">
+      <h2>🔗 API-uri NASA Utilizate</h2>
+      
+      <div class="api-card">
+        <h4>1. 🛰️ CelesTrak TLE Data API</h4>
+        <p><strong>Scop:</strong> Furnizează Two-Line Element (TLE) sets pentru toate obiectele orbitale urmărite.</p>
+        <div class="api-endpoint">
+GET https://celestrak.org/NORAD/elements/gp.php?GROUP={group}&FORMAT=tle
+        </div>
+        <p><strong>Parametri:</strong></p>
+        <ul>
+          <li><code>GROUP</code> - Categoria de sateliți (active, weather, communications, etc.)</li>
+          <li><code>FORMAT</code> - Format răspuns (tle, json, xml)</li>
+        </ul>
+        <p><strong>Răspuns:</strong> Text format TLE (3 linii per satelit: nume, linia 1, linia 2)</p>
+        <div class="info-box">
+          <strong>📚 TLE Format:</strong><br>
+          Linia 1: Număr catalog, clasificare, epoch, derivate mișcare<br>
+          Linia 2: Înclinație, ascensiune dreaptă, excentricitate, argument perigeu, anomalie medie, mișcare medie
+        </div>
+      </div>
+
+      <div class="api-card">
+        <h4>2. 🌌 NASA ORDEM (Orbital Debris Engineering Model)</h4>
+        <p><strong>Scop:</strong> Model statistic pentru fluxul de deșeuri spațiale în funcție de altitudine și dimensiune.</p>
+        <div class="api-endpoint">
+# Model încorporat în aplicație (nu API extern)
+# Date preluate din NASA ORDEM 3.1 Technical Report
+        </div>
+        <p><strong>Parametri Model:</strong></p>
+        <ul>
+          <li><code>altitude_km</code> - Altitudinea orbitei (200-50000 km)</li>
+          <li><code>inclination_deg</code> - Înclinația orbitală (0-180°)</li>
+          <li><code>size_min_cm</code> - Dimensiune minimă deșeu</li>
+          <li><code>size_max_cm</code> - Dimensiune maximă deșeu</li>
+        </ul>
+        <p><strong>Output:</strong> Flux (impacts/m²/year) pentru fiecare interval de dimensiuni</p>
+        <div class="success-box">
+          <strong>🎯 Zone de Risc Identificate:</strong>
+          <ul>
+            <li><strong>400 km</strong> - LEO inferior (ISS, Hubble) - Flux: 1.2e-4 impacts/m²/an</li>
+            <li><strong>800 km</strong> - LEO mijlociu (Iridium) - Flux: 5.8e-5 impacts/m²/an</li>
+            <li><strong>1400 km</strong> - LEO superior - Flux: 3.2e-5 impacts/m²/an</li>
+            <li><strong>20200 km</strong> - MEO (GPS, Galileo) - Flux: 1.5e-6 impacts/m²/an</li>
+            <li><strong>35786 km</strong> - GEO (Comunicații) - Flux: 8.7e-7 impacts/m²/an</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="api-card">
+        <h4>3. ☀️ NASA DONKI (Space Weather Database)</h4>
+        <p><strong>Scop:</strong> Informații despre evenimente solare și impactul lor asupra Pământului.</p>
+        <div class="api-endpoint">
+GET https://api.nasa.gov/DONKI/CME?startDate={date}&api_key={key}
+GET https://api.nasa.gov/DONKI/FLR?startDate={date}&api_key={key}
+GET https://api.nasa.gov/DONKI/GST?startDate={date}&api_key={key}
+        </div>
+        <p><strong>Endpoint-uri:</strong></p>
+        <ul>
+          <li><code>/CME</code> - Coronal Mass Ejections (ejecții masă coronală)</li>
+          <li><code>/FLR</code> - Solar Flares (erupții solare)</li>
+          <li><code>/GST</code> - Geomagnetic Storms (furtuni geomagnetice)</li>
+          <li><code>/IPS</code> - Interplanetary Shocks</li>
+        </ul>
+        <p><strong>Răspuns:</strong> JSON cu data, intensitate, durata și impact previzionat</p>
+        <div class="warning-box">
+          <strong>⚠️ Impact asupra sateliților:</strong>
+          <ul>
+            <li>CME puternice pot deteriora electronica sateliților</li>
+            <li>Solar flares cauzează interferențe radio și GPS</li>
+            <li>Furtuni geomagnetice cresc frecarea atmosferică → decay orbital</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="api-card">
+        <h4>4. 🌍 Space-Track.org API</h4>
+        <p><strong>Scop:</strong> Catalog oficial US Space Command cu date precise despre toate obiectele spațiale.</p>
+        <div class="api-endpoint">
+POST https://www.space-track.org/ajaxauth/login
+GET https://www.space-track.org/basicspacedata/query/class/gp/NORAD_CAT_ID/{id}
+        </div>
+        <p><strong>Autentificare:</strong> Necesită cont gratuit + login cu credențiale</p>
+        <p><strong>Date disponibile:</strong></p>
+        <ul>
+          <li>General Perturbations (GP) - TLE data</li>
+          <li>Satellite Catalog - Metadata complete</li>
+          <li>Decay predictions - Predicții de reintrare</li>
+          <li>Launch site - Informații lansare</li>
+        </ul>
+      </div>
+
+      <div class="api-card">
+        <h4>5. 🔭 Skyfield (SGP4 Propagator)</h4>
+        <p><strong>Scop:</strong> Librărie Python pentru calcule astronomice precise, inclusiv propagare SGP4.</p>
+        <div class="api-endpoint">
+from skyfield.api import EarthSatellite, load, wgs84, utc
+ts = load.timescale()
+sat = EarthSatellite(line1, line2, name, ts)
+geocentric = sat.at(t)
+        </div>
+        <p><strong>Funcționalități:</strong></p>
+        <ul>
+          <li><strong>SGP4 Propagation:</strong> Calcul poziții satelit din TLE</li>
+          <li><strong>Coordinate Transformations:</strong> Geocentric → Geodetic (lat/lon/alt)</li>
+          <li><strong>Time Scales:</strong> UTC, TAI, TT pentru sincronizare precisă</li>
+          <li><strong>Visibility:</strong> Calcul when/where satellites are visible</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Mathematical Formulas Section -->
+    <div class="section" id="math">
+      <h2>📐 Calcule Matematice și Formule</h2>
+      
+      <div class="math-formula">
+        <h4>1. 🛰️ SGP4 Orbital Propagation (Simplified General Perturbations)</h4>
+        <p>Algoritmul SGP4 propagă poziția satelitului din date TLE, luând în considerare perturbațiile gravitaționale și atmosferice.</p>
+        <div class="formula-text">
+<strong>Poziție satelit la timp t:</strong>
+
+r(t) = [x(t), y(t), z(t)]  # Vector poziție 3D
+
+<strong>Calculat prin:</strong>
+1. Extragere parametri orbitali din TLE (a, e, i, Ω, ω, M₀)
+2. Calcul anomalie medie M(t) = M₀ + n·(t - t₀)
+3. Rezolvare ecuație Kepler: M = E - e·sin(E)
+4. Conversie la coordonate carteziene:
+   x = a·(cos(E) - e)
+   y = a·√(1 - e²)·sin(E)
+5. Rotații pentru înclinație și ascensiune dreaptă
+6. Ajustări pentru perturbații (J₂, J₃, J₄, drag atmosferic)
+
+<strong>Parametri TLE:</strong>
+• a  = semi-major axis (km)
+• e  = eccentricity (0-1)
+• i  = inclination (degrees)
+• Ω  = right ascension of ascending node (degrees)
+• ω  = argument of perigee (degrees)
+• M₀ = mean anomaly at epoch (degrees)
+• n  = mean motion (revolutions/day)
+        </div>
+      </div>
+
+      <div class="math-formula">
+        <h4>2. 🎯 Collision Probability Calculation</h4>
+        <p>Probabilitatea ca un satelit să colizioneze cu deșeuri spațiale într-o perioadă dată.</p>
+        <div class="formula-text">
+<strong>Probabilitate anuală de coliziune:</strong>
+
+P_annual = 1 - exp(-F × A × T)
+
+Unde:
+• F = flux deșeuri (impacts/m²/year) [din NASA ORDEM]
+• A = suprafața satelitului (m²)
+• T = perioadă timp (years)
+
+<strong>Flux ORDEM simplificat:</strong>
+
+F(h, i, s) = F₀ × f_altitude(h) × f_inclination(i) × f_size(s)
+
+Unde:
+• h = altitude (km)
+• i = inclination (degrees)
+• s = debris size (cm)
+
+<strong>Factor altitudine (empiric):</strong>
+
+f_altitude(h) = {
+  exp(-|h - 400|/200)     dacă h < 1000 km (LEO)
+  exp(-|h - 800|/300)     dacă 1000 < h < 2000 km
+  1 / (h/1000)²          dacă h > 2000 km (MEO/GEO)
+}
+
+<strong>Factor înclinație:</strong>
+
+f_inclination(i) = 1 + 0.3 × sin(2 × i × π/180)
+  # Risc maxim la ~52° și ~98° (orbite polare/retrogade)
+
+<strong>Exemplu numeric:</strong>
+ISS: A = 10 m², h = 400 km, i = 51.6°, T = 1 year
+F ≈ 1.2e-4 impacts/m²/year (din ORDEM)
+P_annual = 1 - exp(-1.2e-4 × 10 × 1) ≈ 0.0012 = 0.12%
+        </div>
+      </div>
+
+      <div class="math-formula">
+        <h4>3. 📏 3D Distance Calculation (Euclidean Space)</h4>
+        <p>Distanța în spațiu 3D între satelit și deșeu folosind coordonate carteziene.</p>
+        <div class="formula-text">
+<strong>Conversie coordonate sferice → carteziene:</strong>
+
+Pentru un punct la (lat, lon, alt):
+
+R = R_earth + alt  # Rază totală de la centrul Pământului
+x = R × cos(lat) × cos(lon)
+y = R × cos(lat) × sin(lon)
+z = R × sin(lat)
+
+Unde R_earth = 6371 km (raza medie a Pământului)
+
+<strong>Distanța euclidiană:</strong>
+
+d = √[(x₁ - x₂)² + (y₁ - y₂)² + (z₁ - z₂)²]
+
+<strong>Exemplu numeric:</strong>
+Satelit 1: lat=0°, lon=0°, alt=400 km
+  → x₁ = 6771 km, y₁ = 0 km, z₁ = 0 km
+
+Debris: lat=0°, lon=5°, alt=420 km
+  → x₂ ≈ 6751 km, y₂ ≈ 590 km, z₂ = 0 km
+
+d = √[(6771-6751)² + (0-590)² + 0²] 
+  = √[400 + 348100] ≈ 590.3 km
+        </div>
+      </div>
+
+      <div class="math-formula">
+        <h4>4. 🌍 Orbital Velocity Calculation</h4>
+        <p>Viteza orbitală a unui satelit la o altitudine dată.</p>
+        <div class="formula-text">
+<strong>Formula vitezei orbitale circulare:</strong>
+
+v = √(μ / r)
+
+Unde:
+• μ = GM_earth = 398600 km³/s² (parametru gravitațional standard)
+• r = R_earth + altitude (raza orbitală totală)
+
+<strong>Pentru orbite eliptice:</strong>
+
+v = √[μ × (2/r - 1/a)]
+
+Unde:
+• a = semi-major axis
+• r = raza curentă
+
+<strong>Viteza relativă între două obiecte:</strong>
+
+v_rel = |v₁ - v₂| (aproximativ, pentru orbite apropiate)
+
+v_rel_real = √[(v₁ₓ - v₂ₓ)² + (v₁ᵧ - v₂ᵧ)² + (v₁ᵤ - v₂ᵤ)²]
+
+<strong>Exemple numerice:</strong>
+
+ISS (h = 400 km):
+v = √(398600 / 6771) ≈ 7.67 km/s ≈ 27,600 km/h
+
+GPS (h = 20,200 km):
+v = √(398600 / 26571) ≈ 3.87 km/s ≈ 13,900 km/h
+
+GEO (h = 35,786 km):
+v = √(398600 / 42157) ≈ 3.07 km/s ≈ 11,000 km/h
+        </div>
+      </div>
+
+      <div class="math-formula">
+        <h4>5. ⏱️ Orbital Period (Perioada Orbitală)</h4>
+        <p>Timpul necesar unui satelit pentru o revoluție completă.</p>
+        <div class="formula-text">
+<strong>Formula lui Kepler pentru perioada orbitală:</strong>
+
+T = 2π × √(a³ / μ)
+
+Unde:
+• T = perioadă (secunde)
+• a = semi-major axis (km)
+• μ = 398600 km³/s²
+
+<strong>Simplificat pentru orbite circulare:</strong>
+
+T = 2π × √(r³ / μ)
+
+Unde r = R_earth + altitude
+
+<strong>Număr de orbite pe zi:</strong>
+
+n = 86400 / T  (revolutions/day)
+
+<strong>Exemple numerice:</strong>
+
+ISS (h = 400 km, r = 6771 km):
+T = 2π × √(6771³ / 398600) ≈ 5531 s ≈ 92.2 min
+n ≈ 15.6 orbite/zi
+
+GPS (h = 20,200 km, r = 26571 km):
+T = 2π × √(26571³ / 398600) ≈ 43,082 s ≈ 11.97 ore
+n ≈ 2 orbite/zi
+
+GEO (h = 35,786 km, r = 42157 km):
+T = 2π × √(42157³ / 398600) ≈ 86,164 s ≈ 23.93 ore
+n ≈ 1 orbită/zi (sincron cu rotația Pământului!)
+        </div>
+      </div>
+
+      <div class="math-formula">
+        <h4>6. 🎢 Risk Factor Calculation (Factorul de Risc)</h4>
+        <p>Combinarea distanței și vitezei relative pentru evaluarea riscului de coliziune.</p>
+        <div class="formula-text">
+<strong>Factor de risc combinat:</strong>
+
+Risk = w_dist × f_distance + w_vel × f_velocity
+
+Unde:
+• w_dist = 0.7 (pondere distanță)
+• w_vel = 0.3 (pondere viteză)
+
+<strong>Factor distanță normalizat:</strong>
+
+f_distance = max(0, (d_max - d) / d_max)
+
+Unde:
+• d = distanța curentă (km)
+• d_max = raza maximă de căutare (ex: 2000 km)
+
+Valori: 1.0 (foarte aproape) → 0.0 (departe)
+
+<strong>Factor viteză normalizat:</strong>
+
+f_velocity = min(1, v_rel / v_max)
+
+Unde:
+• v_rel = viteza relativă (km/s)
+• v_max = 10 km/s (viteză maximă tipică)
+
+Valori: 0.0 (stationar) → 1.0 (impact frontal maxim)
+
+<strong>Interpretare Risk:</strong>
+• Risk > 0.8: 🔴 CRITICAL (risc extrem de mare)
+• 0.6 < Risk ≤ 0.8: 🟠 HIGH (risc mare)
+• 0.4 < Risk ≤ 0.6: 🟡 MODERATE (risc mediu)
+• 0.2 < Risk ≤ 0.4: 🟢 LOW (risc scăzut)
+• Risk ≤ 0.2: ⚪ MINIMAL (risc neglijabil)
+
+<strong>Exemplu numeric:</strong>
+Debris la d = 25 km, v_rel = 12 km/s, d_max = 2000 km:
+
+f_distance = (2000 - 25) / 2000 = 0.9875
+f_velocity = min(1, 12/10) = 1.0
+
+Risk = 0.7 × 0.9875 + 0.3 × 1.0 
+     = 0.691 + 0.3 = 0.991 → 🔴 CRITICAL!
+        </div>
+      </div>
+    </div>
+
+    <!-- Technical Details Section -->
+    <div class="section" id="technical">
+      <h2>⚙️ Detalii Tehnice de Implementare</h2>
+      
+      <h3>🏗️ Arhitectură Aplicație</h3>
+      <div class="feature-grid">
+        <div class="feature-card">
+          <h4>📦 Backend API (FastAPI)</h4>
+          <ul>
+            <li><strong>Port:</strong> 8001</li>
+            <li><strong>CORS:</strong> Activat pentru localhost</li>
+            <li><strong>Endpoints:</strong> 15+ REST endpoints</li>
+            <li><strong>Cache:</strong> In-memory TLE store</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h4>🌐 Frontend (Cesium.js)</h4>
+          <ul>
+            <li><strong>Port:</strong> 8001 (static files)</li>
+            <li><strong>Rendering:</strong> WebGL 3D</li>
+            <li><strong>State:</strong> Global AppState object</li>
+            <li><strong>Modules:</strong> ES6 imports</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h4>🔧 Dependencies</h4>
+          <ul>
+            <li>fastapi==0.104.1</li>
+            <li>skyfield==1.46</li>
+            <li>numpy==1.24.3</li>
+            <li>cesium==1.122 (CDN)</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>🛠️ Endpoints API Principale</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Endpoint</th>
+              <th>Method</th>
+              <th>Descriere</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>/api/health</code></td>
+              <td>GET</td>
+              <td>Status server + timestamp</td>
+            </tr>
+            <tr>
+              <td><code>/api/tle/load</code></td>
+              <td>POST</td>
+              <td>Încarcă TLE de la CelesTrak</td>
+            </tr>
+            <tr>
+              <td><code>/api/objects</code></td>
+              <td>GET</td>
+              <td>Lista toate obiectele încărcate</td>
+            </tr>
+            <tr>
+              <td><code>/api/satellite/details</code></td>
+              <td>GET</td>
+              <td>Detalii satelit (NORAD ID)</td>
+            </tr>
+            <tr>
+              <td><code>/api/propagate</code></td>
+              <td>GET</td>
+              <td>Propagare SGP4 orbit</td>
+            </tr>
+            <tr>
+              <td><code>/api/satellite/trajectory/{id}</code></td>
+              <td>GET</td>
+              <td>Traiectorie precisă SGP4</td>
+            </tr>
+            <tr>
+              <td><code>/api/flux</code></td>
+              <td>GET</td>
+              <td>Flux ORDEM pentru altitudine</td>
+            </tr>
+            <tr>
+              <td><code>/api/risk</code></td>
+              <td>POST</td>
+              <td>Calcul risc coliziune</td>
+            </tr>
+            <tr>
+              <td><code>/api/risk-zones</code></td>
+              <td>GET</td>
+              <td>5 zone risc NASA ORDEM</td>
+            </tr>
+            <tr>
+              <td><code>/api/debris/predict-impact</code></td>
+              <td>POST</td>
+              <td>Predicție impact cu debris</td>
+            </tr>
+            <tr>
+              <td><code>/api/donki</code></td>
+              <td>GET</td>
+              <td>Space weather NASA DONKI</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>🎨 Frontend Module Structure</h3>
+      <div class="api-card">
+        <h4>Structura Fișiere:</h4>
+        <div class="api-endpoint">
+client/
+├── index.html              # Pagina principală
+├── documentation.html      # Pagina de documentație
+├── app-new.js             # Cesium Manager (vizualizare 3D)
+├── config.js              # Configurare API endpoints
+└── js/
+    ├── constants.js       # Constante (culori, limite)
+    ├── dom-cache.js       # Cache elemente DOM
+    ├── error-handler.js   # Gestiune erori
+    ├── orbital-calculator.js  # Calcule orbitale
+    ├── api-manager.js     # Request-uri API
+    └── event-manager.js   # Event delegation
+        </div>
+      </div>
+
+      <h3>💾 State Management</h3>
+      <div class="api-card">
+        <h4>Global AppState Object:</h4>
+        <div class="api-endpoint">
+AppState = {
+  allSatelliteEntities: [],     // Array entități Cesium All Satellites
+  leoSatelliteEntities: [],     // Array entități LEO
+  nonLeoSatelliteEntities: [],  // Array entități Non-LEO
+  riskZoneEntities: [],         // Array entități zone risc
+  selectedSatellite: null,      // Satelit curent selectat
+  viewer: null                  // Instanță Cesium Viewer
+}
+        </div>
+        <p><strong>Funcții cleanup:</strong> Fiecare funcție de vizualizare șterge entitățile anterioare înainte de a adăuga noi.</p>
+      </div>
+
+      <h3>🎬 Animation System</h3>
+      <div class="math-formula">
+        <h4>Cesium Clock Configuration pentru Orbite Animate:</h4>
+        <div class="formula-text">
+viewer.clock.startTime = startJulianDate;
+viewer.clock.currentTime = startJulianDate;
+viewer.clock.stopTime = stopJulianDate;
+viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+viewer.clock.multiplier = 60;  // 60x real-time speed
+viewer.clock.shouldAnimate = true;
+
+<strong>SampledPositionProperty:</strong>
+property = new Cesium.SampledPositionProperty();
+property.addSample(julianTime, cartesianPosition);
+// Repeat for each trajectory point
+
+entity.position = property;  // Auto-interpolated animation
+        </div>
+      </div>
+
+      <h3>🎨 Visual Hierarchy</h3>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Point Size</th>
+              <th>Color</th>
+              <th>Path Width</th>
+              <th>Label Font</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>All Satellites</strong></td>
+              <td>10px</td>
+              <td>🌈 HSL Rainbow</td>
+              <td>3px</td>
+              <td>bold 11px</td>
+            </tr>
+            <tr>
+              <td><strong>LEO Satellites</strong></td>
+              <td>10px</td>
+              <td>🌊 AQUA</td>
+              <td>3px</td>
+              <td>bold 11px</td>
+            </tr>
+            <tr>
+              <td><strong>Non-LEO Satellites</strong></td>
+              <td>12px</td>
+              <td>🟠 DARKORANGE + YELLOW</td>
+              <td>4px</td>
+              <td>bold 12px</td>
+            </tr>
+            <tr>
+              <td><strong>Risk Zones</strong></td>
+              <td>6-10px</td>
+              <td>🔴🟠🟡🟢🔵 (gradient)</td>
+              <td>-</td>
+              <td>11px bold</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="section">
+      <h2>🚀 Resurse Adiționale</h2>
+      <p>Pentru mai multe informații despre deșeurile spațiale și siguranța orbitală:</p>
+      <div>
+        <a href="https://orbitaldebris.jsc.nasa.gov/" target="_blank" class="button-link">📊 NASA Orbital Debris Program</a>
+        <a href="https://celestrak.org/" target="_blank" class="button-link">🛰️ CelesTrak</a>
+        <a href="https://www.space-track.org/" target="_blank" class="button-link">🌍 Space-Track.org</a>
+        <a href="https://github.com/skyfielders/python-skyfield" target="_blank" class="button-link">🔭 Skyfield Documentation</a>
+        <a href="https://cesium.com/learn/" target="_blank" class="button-link">🌐 Cesium.js Docs</a>
+      </div>
+      
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(74, 144, 226, 0.3); text-align: center; color: #888;">
+        <p>Space Debris Tracker © 2025 | Built with ❤️ using NASA APIs, Cesium.js & FastAPI</p>
+        <p><a href="/" style="color: #4a90e2;">← Înapoi la Aplicație</a></p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
