@@ -1,13 +1,10 @@
-# 🛰️ Space Debris Tracker - NASA Demo
+# 🛰️ Space Debris Tracker - NASA Space Apps
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.104+-green.svg)](https://fastapi.tiangolo.com/)
 [![Cesium](https://img.shields.io/badge/Cesium-1.122-blue.svg)](https://cesium.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-> **Advanced 3D visualization and analysis platform for tracking space debris and satellites using real NASA data and SGP4 orbital propagation.**
-
-![Space Debris Tracker Demo](https://via.placeholder.com/800x400/0a0e27/4a90e2?text=Space+Debris+Tracker+Demo)
 
 ---
 
