@@ -739,9 +739,19 @@
   console.log('✓ CESIUM_BASE_URL set');
 </script>
 <!-- Load configuration first -->
-<script src="/static/config.js?v=6"></script>
+<script src="/static/config.js?v=7"></script>
 <script>
-  console.log('✓ config.js loaded, CESIUM_ION_TOKEN:', typeof window.CESIUM_ION_TOKEN !== 'undefined' ? 'SET' : 'MISSING');
+  // Check token immediately after config loads
+  if (typeof window.CESIUM_ION_TOKEN !== 'undefined') {
+    if (!window.CESIUM_ION_TOKEN || window.CESIUM_ION_TOKEN.trim() === '' || window.CESIUM_ION_TOKEN.trim() === ' ') {
+      console.warn('⚠️ WARNING: CESIUM_ION_TOKEN is empty or invalid!');
+      console.warn('Get your free token from: https://cesium.com/ion/tokens');
+    } else {
+      console.log('✓ config.js loaded, CESIUM_ION_TOKEN: SET (' + window.CESIUM_ION_TOKEN.substring(0, 20) + '...)');
+    }
+  } else {
+    console.error('❌ CESIUM_ION_TOKEN is not defined! Check config.js');
+  }
   
   // Dynamic satellite settings panel updater
   document.addEventListener('DOMContentLoaded', function() {

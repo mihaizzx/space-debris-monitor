@@ -48,9 +48,22 @@
     try {
       console.log('Initializing Cesium...');
       
-      if (window.CESIUM_ION_TOKEN) {
+      // Check if token exists and is not empty/whitespace
+      if (!window.CESIUM_ION_TOKEN || window.CESIUM_ION_TOKEN.trim() === '') {
+        const errorMsg = '⚠️ Cesium Ion Access Token Missing!\n\n' +
+                        'The 3D globe cannot be displayed without a valid Cesium Ion token.\n\n' +
+                        'To fix this:\n' +
+                        '1. Visit https://cesium.com/ion/tokens\n' +
+                        '2. Create a FREE account\n' +
+                        '3. Copy your access token\n' +
+                        '4. Paste it in client/config.js\n\n' +
+                        'For now, a default token has been provided, but it may not work.';
+        
+        alert(errorMsg);
+        console.error('❌ CESIUM_ION_TOKEN is missing or empty!');
+      } else {
         Cesium.Ion.defaultAccessToken = window.CESIUM_ION_TOKEN;
-        console.log('Ion token set');
+        console.log('✅ Ion token set:', window.CESIUM_ION_TOKEN.substring(0, 20) + '...');
       }
 
       // Use basic ellipsoid terrain - it's synchronous and always works
@@ -157,7 +170,22 @@
 
       return viewer;
     } catch (error) {
-      console.error('Cesium initialization error:', error);
+      console.error('❌ Cesium initialization error:', error);
+      
+      // Show detailed error alert
+      const errorMsg = '❌ Failed to Initialize 3D Globe!\n\n' +
+                      'Error: ' + error.message + '\n\n' +
+                      'Common causes:\n' +
+                      '• Invalid or expired Cesium Ion token\n' +
+                      '• Network connection issues\n' +
+                      '• Browser compatibility problems\n\n' +
+                      'Solution:\n' +
+                      '1. Get a new token from https://cesium.com/ion/tokens\n' +
+                      '2. Update client/config.js with your token\n' +
+                      '3. Refresh the page\n\n' +
+                      'Check browser console (F12) for more details.';
+      
+      alert(errorMsg);
       ErrorManager.handleJsError(error, 'Cesium initialization');
       throw error;
     }
